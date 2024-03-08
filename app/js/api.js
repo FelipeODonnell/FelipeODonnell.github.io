@@ -52,7 +52,7 @@ fetchDataFromApi();
 
 
 *To integrate to front end:
-<script src="path/to/fetchApiData.js"></script>
+<script src="/app/js/api"></script>
 
 
 
