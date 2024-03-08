@@ -1,5 +1,99 @@
 
 
+
+
+
+// Function to handle file uploads
+function uploadFile(type) {
+    const formData = new FormData();
+    const fileInput = document.getElementById(`${type}Upload`);
+    formData.append(type, fileInput.files[0]);
+    
+    fetch('/upload', {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+  }
+  
+  // Function to fetch and display table data
+  function fetchTableData() {
+    fetch('/getClientsData')
+      .then(response => response.json())
+      .then(data => {
+        const table = document.getElementById('clientsTable');
+        data.forEach(client => {
+          const row = table.insertRow(-1);
+          row.insertCell(0).textContent = client.id;
+          row.insertCell(1).textContent = client.name;
+          row.insertCell(2).textContent = client.details;
+        });
+      });
+  
+    // Add fetching for property data in a similar manner
+  }
+  
+  // Function for chatbot interaction
+  function sendMessage() {
+    const input = document.getElementById('chatInput').value;
+    fetch('/sendMessage', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: input }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      const chatOutput = document.getElementById('chatOutput');
+      const responseElement = document.createElement('div');
+      responseElement.textContent = data.response;
+      chatOutput.appendChild(responseElement);
+    });
+  }
+  
+  // Populate tables on page load
+  document.addEventListener('DOMContentLoaded', fetchTableData);
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 
 
