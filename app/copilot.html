@@ -562,6 +562,71 @@
 
 
 
+                                        <h1>Cloudflare File Upload and RAG Chatbot</h1>
+
+                                        <h2>File Upload</h2>
+                                        <form id="uploadForm">
+                                        <input type="file" id="fileInput" />
+                                        <button type="submit">Upload</button>
+                                        </form>
+
+                                        <h2>Uploaded Files</h2>
+                                        <table id="fileTable">
+                                        <thead>
+                                            <tr>
+                                            <th>File Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        </table>
+
+                                        <h2>RAG Chatbot</h2>
+                                        <div id="chatbotResponse"></div>
+                                        <input type="text" id="queryInput" placeholder="Enter your query" />
+                                        <button id="submitQuery">Submit</button>
+
+                                        <script src="js/api.js"></script>
+                                        <script>
+                                        const form = document.getElementById('uploadForm');
+                                        const fileInput = document.getElementById('fileInput');
+                                        const queryInput = document.getElementById('queryInput');
+                                        const submitButton = document.getElementById('submitQuery');
+                                        const responseContainer = document.getElementById('chatbotResponse');
+
+                                        form.addEventListener('submit', async (event) => {
+                                            event.preventDefault();
+                                            const file = fileInput.files[0];
+                                            const { userId, response } = await uploadFile(file);
+                                            console.log(`File uploaded for user ${userId}:`, response);
+                                            displayFiles(userId);
+                                        });
+
+                                        async function displayFiles(userId) {
+                                            const files = await getFiles(userId);
+                                            const tableBody = document.querySelector('#fileTable tbody');
+                                            tableBody.innerHTML = '';
+
+                                            files.forEach(file => {
+                                            const row = document.createElement('tr');
+                                            const nameCell = document.createElement('td');
+                                            nameCell.textContent = file.name;
+                                            row.appendChild(nameCell);
+                                            tableBody.appendChild(row);
+                                            });
+                                        }
+
+                                        submitButton.addEventListener('click', async () => {
+                                            const query = queryInput.value.trim();
+                                            if (query) {
+                                            const response = await getRagChatbotResponse(query, userId);
+                                            responseContainer.textContent = response;
+                                            }
+                                        });
+                                        </script>
+
+
+
+
                             </div>
                         </div>
                     </div>

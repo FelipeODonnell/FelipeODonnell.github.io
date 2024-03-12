@@ -1,161 +1,62 @@
 
 
 
+// Replace with your Cloudflare account ID and API token
+const accountId = '2dbadb5985d6a2659ecd1f40eec2044a';
+const token = '56c9002c08f049081aa2d5155c9bbd8f96cf4';
 
+const AItoken='CYLR7pkcLgPIO5oFzwIveL4UPFSRxOD6u0ktzurH';
 
-// Function to handle file uploads
-function uploadFile(type) {
-    const formData = new FormData();
-    const fileInput = document.getElementById(`${type}Upload`);
-    formData.append(type, fileInput.files[0]);
-    
-    fetch('/upload', {
-      method: 'POST',
-      body: formData,
-    })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error('Error:', error));
+// Initialize the Cloudflare API
+const cf = cloudflare({
+  accountId: accountId,
+  token: token
+});
+
+// Generate a unique user ID
+function generateUserId() {
+  const timestamp = Date.now();
+  const randomNum = Math.floor(Math.random() * 1000000);
+  const userId = `USER_${timestamp}_${randomNum}`;
+  return userId;
+}
+
+// Upload a file to Cloudflare D1 database with a generated user ID
+async function uploadFile(file) {
+  try {
+    const userId = generateUserId();
+    const databaseName = `USER_${userId}`;
+    const response = await cf.d1Database.upload(databaseName, file);
+    return { userId, response };
+  } catch (error) {
+    console.error(`Error uploading file for user ${userId}:`, error);
+    throw error;
   }
-  
-  // Function to fetch and display table data
-  function fetchTableData() {
-    fetch('/getClientsData')
-      .then(response => response.json())
-      .then(data => {
-        const table = document.getElementById('clientsTable');
-        data.forEach(client => {
-          const row = table.insertRow(-1);
-          row.insertCell(0).textContent = client.id;
-          row.insertCell(1).textContent = client.name;
-          row.insertCell(2).textContent = client.details;
-        });
-      });
-  
-    // Add fetching for property data in a similar manner
+}
+
+// Get a list of files from Cloudflare D1 database for a specific user
+async function getFiles(userId) {
+  try {
+    const databaseName = `USER_${userId}`;
+    const files = await cf.d1Database.list(databaseName);
+    return files;
+  } catch (error) {
+    console.error(`Error getting files for user ${userId}:`, error);
+    throw error;
   }
-  
-  // Function for chatbot interaction
-  function sendMessage() {
-    const input = document.getElementById('chatInput').value;
-    fetch('/sendMessage', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: input }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      const chatOutput = document.getElementById('chatOutput');
-      const responseElement = document.createElement('div');
-      responseElement.textContent = data.response;
-      chatOutput.appendChild(responseElement);
+}
+
+// Retrieve RAG chatbot response from Cloudflare AI for a specific user
+async function getRagChatbotResponse(query, userId) {
+  try {
+    const files = await getFiles(userId);
+    const response = await cf.ai.getRagResponse(query, {
+      documents: files,
+      modelId: 'mistral-7b-instruct-v0.1'
     });
+    return response;
+  } catch (error) {
+    console.error(`Error getting RAG chatbot response for user ${userId}:`, error);
+    throw error;
   }
-  
-  // Populate tables on page load
-  document.addEventListener('DOMContentLoaded', fetchTableData);
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-// Replace 'apiEndpointUrl' with the URL of the API you want to use
-const apiEndpointUrl = 'https://example.com/api/data';
-
-// Replace 'elementId' with the ID of the element where you want to display the API data
-const elementId = 'apiDataContainer';
-
-// Function to fetch data from the API
-function fetchDataFromApi() {
-    fetch(apiEndpointUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`API call failed: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            displayDataOnPage(data);
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-            displayErrorOnPage(error);
-        });
 }
-
-// Function to display fetched data on the page
-function displayDataOnPage(data) {
-    // Assuming 'data' is an object or array. Customize this part based on the structure of your API response
-    const container = document.getElementById(elementId);
-    if (!container) return;
-
-    // Example of displaying data: assuming data has a 'name' property
-    // Adjust this according to the actual data structure you're working with
-    container.innerHTML = `Name: ${data.name}`;
-}
-
-// Function to display an error message on the page in case of a failure
-function displayErrorOnPage(error) {
-    const container = document.getElementById(elementId);
-    if (!container) return;
-
-    container.innerHTML = `Failed to load data: ${error.message}`;
-}
-
-// Call the function to fetch data from the API and display it on the page
-fetchDataFromApi();
-
-
-
-*To integrate to front end:
-<script src="/app/js/api"></script>
-
-
-
-
-*** To inlcude in this file for ApexMatch***
-
-Upload data (graph database)
-Display tables and analytics
-Coilot to talk with data - mistral
-Image enhance - stability AI
-Email integration
-*/
