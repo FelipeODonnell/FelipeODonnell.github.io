@@ -6,6 +6,17 @@ const accountId = '2dbadb5985d6a2659ecd1f40eec2044a';
 const token = '56c9002c08f049081aa2d5155c9bbd8f96cf4';
 
 const AItoken='CYLR7pkcLgPIO5oFzwIveL4UPFSRxOD6u0ktzurH';
+const databaseID='ef6ca80c-12e6-4434-9898-555430de88d7'
+
+
+
+/*
+[[d1_databases]]
+binding = "DB"
+database_name = "apexmatchdatabase"
+database_id = "ef6ca80c-12e6-4434-9898-555430de88d7"
+*/
+
 
 // Initialize the Cloudflare API
 const cf = cloudflare({
