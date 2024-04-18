@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User List</title>
+</head>
+<body>
+  <h1>User List</h1>
+  <p>Number of users signed up: <span id="userCount">0</span></p>
+  <ul id="emailList"></ul>
+
+  <script>
+    function displayUserList() {
+      const emails = JSON.parse(localStorage.getItem('emails')) || [];
+      const userCount = emails.length;
+      document.getElementById('userCount').textContent = userCount;
+
+      const emailList = document.getElementById('emailList');
+      emailList.innerHTML = '';
+      emails.forEach(email => {
+        const listItem = document.createElement('li');
+        listItem.textContent = email;
+        emailList.appendChild(listItem);
+      });
+    }
+
+    displayUserList();
+  </script>
+</body>
+</html>
